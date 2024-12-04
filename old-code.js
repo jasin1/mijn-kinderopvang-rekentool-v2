@@ -67,7 +67,6 @@ let voorschoolse_opvang = {
             woensdag_uren: "6.67",
             donderdag_uren: "6.67",
             vrijdag_uren: "6.67",
-
         },
 
     tarief_2:
