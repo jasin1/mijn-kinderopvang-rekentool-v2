@@ -1,13 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reken-Tool</title>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reken-Tool</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <article>
+        <section class="progress-bar"></section>
+        <section class="container">
+          <div class="info">
+            <h1>Bereken uw pakket voor 2025</h1>
+            <p>
+              Ouders hebben het recht om maximaal 230 uur kinderopvang per maand
+              af te nemen, ook als een ouder slechts 1 uur per maand werkt.
+            </p>
+          </div>
+          <div class="calc-wrapper">
+            <div id="step-1" class="step active">
+              <h2>Selecteer gewenste opvang:</h2>
+              <div id="service-options">
+                <ul>
+                  <!-- <li class="service-item">
+                    <div class="circle"></div>
+                    <div id="service-option" class="service">
+                      <h3>service name</h3>
+                      <span>service subtitle</span>
+                    </div>
+                  </li> -->
+                </ul>
+              </div>   
+            </div>
+            <div id="step-2" class="step">
+              <h2>Selecteer gewenste tarief:</h2>
+              <div id="tariff-options"></div>   
+            </div>
+            <div id="step-3" class="step">
+              <h2>Selecteer aantal dagen</h2>   
+              </h2>
+              <div id="day-options"></div>
+            </div>
+            <div id="step-4" class="step">
+              <h2>Overzicht</h2>
+              <div id="result-summary"></div>
+            </div>
+          </div>
+        </section>
+      </article>
+    </main>
 
-  <h1>Halooooo</h1>
-  <script src="rekentool-v2.js"></script>
-</body>
+    <script src="rekentool-v2.js"></script>
+  </body>
 </html>
