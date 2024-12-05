@@ -119,11 +119,11 @@ h2{
   display: block;
 }
 
-.service-item.selected .circle{
+.selected .circle{
   border: 2px solid blue;
 }
 
-.service-item.selected .circle::before{
+.selected .circle::before{
   background-color: blue;
 }
 
