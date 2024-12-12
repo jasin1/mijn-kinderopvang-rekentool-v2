@@ -1,3 +1,8 @@
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateButtonStates(); 
+});
+
 const days = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag"];
 
 const data = {
@@ -84,18 +89,25 @@ const state = {
   totalCalculation: null,
 };
 
+// ----- Global Query selectors ------ //
+
+// -- Steps and buttons
+const prev = document.querySelector(".prev");
+const next = document.querySelector(".next");
+const steps = document.querySelectorAll(".step");
+
+// -- Progress bar 
+const progressBar = document.querySelector(".progress-bar");
+const stepText = document.querySelectorAll(".step-show-txt");
+
+
+//----- helper functions ------------- //
+
 function updateState(key, value) {
   if (state[key] !== value) {
     state[key] = value;
   }
 }
-
-function formateServiceName(key, isLast) {
-  return isLast ? `${key}opvang` : `${key} opvang`;
-}
-
-// ------ Step population logic ----- //
-
 function populateStep(step) {
   switch (step) {
     case 1:
@@ -111,20 +123,105 @@ function populateStep(step) {
       console.error("Unknown step!");
   }
   updateButtonStates();
+  updateProgressBar();
 }
 
 function validateStep(step) {
   const validations = {
-    1: () => state.selectedService !== null,
-    2: () => state.selectedTariff !== null,
-    3: () => state.selectedDays.length > 0,
+    1: () => {
+      // console.log("Validating step 1: selectedService = ", state.selectedService);
+      return (
+        state.selectedService !== null && state.selectedService !== undefined
+      );
+    },
+    2: () => {
+      // console.log("Validating step 2: selectedService = ", state.selectedService, " selectedTariff = ", state.selectedTariff, "selected title", state.selectedTitle);
+      return (
+        state.selectedService !== null &&
+        state.selectedTariff !== null &&
+        state.selectedTariff !== undefined
+      );
+    },
+    3: () => {
+      // console.log("Validating step 3: selectedDays = ", state.selectedDays);
+      return state.selectedDays.length > 0;
+    },
   };
 
-  return validations[step] ? validations[step]() : true;
+  return validations[step] ? validations[step]() : false;
 }
 
-// ------ populating step one ----- //
+function formatStep2Txt(title, tariff){
+  const firstThreeLetters = title.slice(0,3);
+  return `${firstThreeLetters} - tarief €${tariff}`
+}
 
+function formatSubtitle(subtitle) {
+  const timePattern = /(\d{2}:\d{2} t\/m \d{2}:\d{2})/g;
+  return subtitle.replace(timePattern, "$1<br>");
+}
+
+function updateProgressBar() {
+  const stepIndicators = document.querySelectorAll(".step-indicator");
+
+  stepIndicators.forEach((indicator, index) => {
+    const stepNumber = index + 1; // Steps are 1-based
+
+    // Reset content and classes
+    indicator.setAttribute("data-step", stepNumber); // For debugging or :before usage
+    indicator.textContent = stepNumber; // Default to step number
+
+    // Determine the state of the step
+    if (stepNumber < state.currentStep) {
+      // Validate the step to decide its state
+      if (validateStep(stepNumber)) {
+        indicator.classList.add("completed"); // Mark as completed
+        indicator.textContent = ""; // Clear number to show SVG
+      } else {
+        // If revisited, reset to active state
+        indicator.classList.remove("completed");
+        indicator.classList.add("active");
+      }
+    } else if (stepNumber === state.currentStep) {
+      // Current step is active
+      indicator.classList.add("active");
+      indicator.classList.remove("completed");
+    } else {
+      // Future steps remain neutral
+      indicator.classList.remove("active", "completed");
+    }
+  });
+}
+
+function updateButtonStates() {
+  console.log("Validating step: ", state.currentStep);
+  prev.disabled = state.currentStep === 1;
+  const isValid = validateStep(state.currentStep);
+  console.log(`step ${state.currentStep} valid`, isValid);
+  next.disabled = !isValid;
+}
+
+function formateServiceName(key, isLast) {
+  return isLast ? `${key}opvang` : `${key} opvang`;
+}
+
+function updateStepDisplay() {
+  steps.forEach((step, index) => {
+    step.classList.remove("active");
+
+    if (index + 1 === state.currentStep) {
+      step.classList.add("active");
+    }
+  });
+}
+
+
+updateProgressBar();
+
+
+
+
+// ------ populating step one ----- //
 function populateServiceStep() {
   const serviceOptionsContainer = document.querySelector("#service-options ul");
   serviceOptionsContainer.innerHTML = "";
@@ -149,7 +246,7 @@ function populateServiceStep() {
     h3.textContent = formattedName;
 
     const span = document.createElement("span");
-    span.textContent = subtitle;
+    span.innerHTML = formatSubtitle(subtitle);
 
     // Append children
     serviceDiv.appendChild(h3);
@@ -170,27 +267,27 @@ function populateServiceStep() {
         el.classList.remove("selected");
       });
       li.classList.add("selected");
-      
+
       if (state.selectedService !== key) {
         state.selectedDays = [];
       }
-      
+
       updateState("selectedService", key);
       updateState("selectedTariff", data[key].tarief);
       updateState("selectedTitle", data[key].title);
-      // updateState("selectedHours", data[key].uren);
       updateButtonStates();
+      stepText[0].innerHTML = formattedName;
 
-      console.log("selected service: ", state.selectedService);
-      console.log("Selected days:", state.selectedDays);
+      // console.log("selected service: ", state.selectedService);
+      // console.log("Selected days:", state.selectedDays);
     });
   });
 }
-
 populateServiceStep();
 
+// ------ populating step two ----- //
 function populateTariffStep() {
-  console.log("Entering Step 2: Selected Tariff", state.selectedTariff);
+  // console.log("Entering Step 2: Selected Tariff", state.selectedTariff);
   const service = state.selectedService;
   const tariffs = data[service].options;
 
@@ -239,21 +336,20 @@ function populateTariffStep() {
         updateState("selectedTariff", option.tarief);
         updateState("selectedTitle", option.title);
         updateState("selectedHours", option.uren);
-
         updateButtonStates();
-
         state.selectedDays = [];
       }
 
-      console.log("Selected tariff:", state.selectedTariff);
-      // console.log("Selected title:", state.selectedTitle);
-      // console.log("selected days", state.selectedDays);
-      // console.log("selected hours", state.selectedHours);
+      const formattedText = formatStep2Txt(option.title, option.tarief);
+      stepText[1].innerHTML = formattedText;
+
+
     });
   });
   updateButtonStates();
 }
 
+// ------ populating step three ----- //
 function populateDaysStep() {
   // console.log("step 3");
   // const service = state.selectedService;
@@ -303,35 +399,12 @@ function populateDaysStep() {
       }
       updateButtonStates();
 
-      console.log("selected days: ", state.selectedDays);
+      // console.log("selected days: ", state.selectedDays);
     });
   });
 }
 
-// ------ navigating steps ----- //
-
-const prev = document.querySelector(".prev");
-const next = document.querySelector(".next");
-const steps = document.querySelectorAll(".step");
-
-function updateStepDisplay() {
-  steps.forEach((step, index) => {
-    step.classList.remove("active");
-
-    if (index + 1 === state.currentStep) {
-      step.classList.add("active");
-    }
-  });
-}
-
-function updateButtonStates() {
-  // Handle "Previous" button
-  prev.disabled = state.currentStep === 1;
-
-  // Handle "Next" button
-  const isValid = validateStep(state.currentStep);
-  next.disabled = !isValid; // Disable if the current step is invalid
-}
+// ------ Event Listeners -------- //
 
 prev.addEventListener("click", () => {
   console.log("previous");
@@ -344,7 +417,7 @@ prev.addEventListener("click", () => {
 });
 
 next.addEventListener("click", () => {
-  console.log("current step", state.currentStep);
+  console.log("next btn clicked, current step: ", state.currentStep);
 
   if (!validateStep(state.currentStep)) {
     console.log(
