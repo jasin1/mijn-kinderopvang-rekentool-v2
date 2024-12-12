@@ -100,7 +100,6 @@ function populateStep(step) {
   switch (step) {
     case 1:
       populateServiceStep();
-
       break;
     case 2:
       populateTariffStep();
@@ -111,6 +110,17 @@ function populateStep(step) {
     default:
       console.error("Unknown step!");
   }
+  updateButtonStates();
+}
+
+function validateStep(step) {
+  const validations = {
+    1: () => state.selectedService !== null,
+    2: () => state.selectedTariff !== null,
+    3: () => state.selectedDays.length > 0,
+  };
+
+  return validations[step] ? validations[step]() : true;
 }
 
 // ------ populating step one ----- //
@@ -160,15 +170,16 @@ function populateServiceStep() {
         el.classList.remove("selected");
       });
       li.classList.add("selected");
-
-      if(state.selectedService !== key){
+      
+      if (state.selectedService !== key) {
         state.selectedDays = [];
       }
- 
+      
       updateState("selectedService", key);
       updateState("selectedTariff", data[key].tarief);
       updateState("selectedTitle", data[key].title);
-      updateState("selectedHours", data[key].uren);
+      // updateState("selectedHours", data[key].uren);
+      updateButtonStates();
 
       console.log("selected service: ", state.selectedService);
       console.log("Selected days:", state.selectedDays);
@@ -179,6 +190,7 @@ function populateServiceStep() {
 populateServiceStep();
 
 function populateTariffStep() {
+  console.log("Entering Step 2: Selected Tariff", state.selectedTariff);
   const service = state.selectedService;
   const tariffs = data[service].options;
 
@@ -228,15 +240,18 @@ function populateTariffStep() {
         updateState("selectedTitle", option.title);
         updateState("selectedHours", option.uren);
 
+        updateButtonStates();
+
         state.selectedDays = [];
       }
 
       console.log("Selected tariff:", state.selectedTariff);
-      console.log("Selected title:", state.selectedTitle);
-      console.log("selected days", state.selectedDays);
-      console.log("selected hours", state.selectedHours);
+      // console.log("Selected title:", state.selectedTitle);
+      // console.log("selected days", state.selectedDays);
+      // console.log("selected hours", state.selectedHours);
     });
   });
+  updateButtonStates();
 }
 
 function populateDaysStep() {
@@ -264,26 +279,29 @@ function populateDaysStep() {
     dayDiv.appendChild(dayValue);
     li.appendChild(circle);
     li.appendChild(dayDiv);
-    
-    const isSelected = state.selectedDays.some(day => day.name === dayName);
+
+    const isSelected = state.selectedDays.some((day) => day.name === dayName);
     if (isSelected) {
       li.classList.add("selected");
     }
-    
+
     dayOptionContainer.appendChild(li);
 
     li.addEventListener("click", () => {
-     const dayIndex = state.selectedDays.findIndex(day => day.name === dayName);
+      const dayIndex = state.selectedDays.findIndex(
+        (day) => day.name === dayName,
+      );
 
       if (li.classList.contains("selected")) {
         li.classList.remove("selected");
-        if(dayIndex !== -1){
+        if (dayIndex !== -1) {
           state.selectedDays.splice(dayIndex, 1);
         }
       } else {
         li.classList.add("selected");
-        state.selectedDays.push({ name: dayName, value: hour});
+        state.selectedDays.push({ name: dayName, value: hour });
       }
+      updateButtonStates();
 
       console.log("selected days: ", state.selectedDays);
     });
@@ -307,17 +325,12 @@ function updateStepDisplay() {
 }
 
 function updateButtonStates() {
-  if (state.currentStep === 1) {
-    prev.disabled = true;
-  } else {
-    prev.disabled = false;
-  }
+  // Handle "Previous" button
+  prev.disabled = state.currentStep === 1;
 
-  if (state.currentStep === steps.length) {
-    next.textContent = "Reken Uit";
-  } else {
-    next.textContent = "Volgende";
-  }
+  // Handle "Next" button
+  const isValid = validateStep(state.currentStep);
+  next.disabled = !isValid; // Disable if the current step is invalid
 }
 
 prev.addEventListener("click", () => {
@@ -331,10 +344,21 @@ prev.addEventListener("click", () => {
 });
 
 next.addEventListener("click", () => {
+  console.log("current step", state.currentStep);
+
+  if (!validateStep(state.currentStep)) {
+    console.log(
+      `Step ${state.currentStep} is not valid. Please make a selection.`,
+    );
+    return; // Prevent navigation
+  }
+
   if (state.currentStep < steps.length) {
     state.currentStep += 1;
     updateStepDisplay();
     updateButtonStates();
     populateStep(state.currentStep);
+  } else if (state.currentStep === steps.length) {
+    console.log("last step");
   }
 });
