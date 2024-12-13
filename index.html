@@ -13,18 +13,22 @@
           <div class="step-show-wrapper">
             <div class="step-indicator"></div>
             <p class="step-show-txt">Keuze opvang</p>
+            <div class="line"></div>
           </div>
           <div class="step-show-wrapper">
             <div class="step-indicator"></div>
             <p class="step-show-txt">Keuze tarief</p>
+            <div class="line"></div>
           </div>
           <div class="step-show-wrapper">
             <div class="step-indicator"></div>
             <p class="step-show-txt">Aantal dagen</p>
+            <div class="line"></div>
           </div>
           <div class="step-show-wrapper">
             <div class="step-indicator"></div>
             <p class="step-show-txt">Samenvatting</p>
+            
           </div>
         </section>
         <section class="container">
@@ -40,13 +44,6 @@
               <h2>Selecteer gewenste opvang:</h2>
               <div id="service-options">
                 <ul>
-                  <!-- <li class="service-item">
-                    <div class="circle"></div>
-                    <div id="service-option" class="service">
-                      <h3>service name</h3>
-                      <span>service subtitle</span>
-                    </div>
-                  </li> -->
                 </ul>
               </div>   
             </div>
@@ -89,8 +86,26 @@
           </div>
         </section>
         <section class="container">
-          <div>Overzicht</div>
-          <div>form</div>
+          <div class="summary">
+            <div class="sum-wrapper">
+
+              <h2>Samenvatting</h2>
+              <div class="summary-grid">
+                <div class="summary-label">Gekozen opvang:</div>
+                <div id="chosen-service" class="summary-value">----</div>
+                <div class="summary-label">Gekozen tarief:</div>
+                <div id="chosen-tariff" class="summary-value">----</div>
+                <div class="summary-label">Gekozen dagen:</div>
+                <div id="chosen-days" class="summary-value">----</div>
+                <div class="summary-label">Totale uren per maand:</div>
+                <div id="total-hours" class="summary-value">----</div>
+                <div class="summary-label">Totaal kosten pakket:</div>
+                <div id="total-cost" class="summary-value">----</div>
+              </div>
+              <div id="notification"></div>
+            </div>
+          </div>
+          <div class="form">form</div>
         </section>
       </article>
     </main>

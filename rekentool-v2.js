@@ -1,6 +1,5 @@
-
 document.addEventListener("DOMContentLoaded", () => {
-  updateButtonStates(); 
+  updateButtonStates();
 });
 
 const days = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag"];
@@ -96,10 +95,17 @@ const prev = document.querySelector(".prev");
 const next = document.querySelector(".next");
 const steps = document.querySelectorAll(".step");
 
-// -- Progress bar 
+// -- Progress bar
 const progressBar = document.querySelector(".progress-bar");
 const stepText = document.querySelectorAll(".step-show-txt");
 
+// -- Summary
+const chosenService = document.getElementById("chosen-service");
+const chosenTariff = document.getElementById("chosen-tariff");
+const chosenDays = document.getElementById("chosen-days");
+const totalHours = document.getElementById("total-hours");
+const totalCost = document.getElementById("total-cost");
+const notification = document.getElementById("notification");
 
 //----- helper functions ------------- //
 
@@ -151,9 +157,9 @@ function validateStep(step) {
   return validations[step] ? validations[step]() : false;
 }
 
-function formatStep2Txt(title, tariff){
-  const firstThreeLetters = title.slice(0,3);
-  return `${firstThreeLetters} - tarief €${tariff}`
+function formatStep2Txt(title, tariff) {
+  const firstThreeLetters = title.slice(0, 3);
+  return `${firstThreeLetters} - tarief €${tariff}`;
 }
 
 function formatSubtitle(subtitle) {
@@ -215,11 +221,20 @@ function updateStepDisplay() {
   });
 }
 
+function calculation(a, b) {
+  const korting = a*230;
+  if (b > 230) {
+    notification.textContent = `
+    * U krijgt een halve dag gratis van ons bij dit gekozen opvang pakket. Normaliter 260 uur maar u ontvangt 30 uur korting dat betekend wat u moet doorgeven aan de belastingdienst is; 230 X €${state.selectedTariff} = €${korting} per maand voor 5 hele dagen!
+    `
+    return a * 230;
+  } else {
+    return a * b;
+  }
+}
+
 
 updateProgressBar();
-
-
-
 
 // ------ populating step one ----- //
 function populateServiceStep() {
@@ -338,12 +353,12 @@ function populateTariffStep() {
         updateState("selectedHours", option.uren);
         updateButtonStates();
         state.selectedDays = [];
+        chosenService.textContent = state.selectedTitle;
+        chosenTariff.textContent = `€ ${state.selectedTariff}`;
       }
 
       const formattedText = formatStep2Txt(option.title, option.tarief);
       stepText[1].innerHTML = formattedText;
-
-
     });
   });
   updateButtonStates();
@@ -397,12 +412,23 @@ function populateDaysStep() {
         li.classList.add("selected");
         state.selectedDays.push({ name: dayName, value: hour });
       }
+      chosenDays.textContent = state.selectedDays
+        .map((day) => day.name)
+        .join(", ");
+      const meHours = state.selectedDays
+        .map((day) => day.value)
+        .reduce((a, b) => a + b, 0)
+        .toFixed(2);
+      totalHours.textContent = meHours;
+      totalCost.textContent = calculation(state.selectedTariff, meHours);
+      // totalCost.textContent = (state.selectedTariff * meHours).toFixed(2);
       updateButtonStates();
 
-      // console.log("selected days: ", state.selectedDays);
+      console.log("selected hours: ", meHours);
     });
   });
 }
+
 
 // ------ Event Listeners -------- //
 
