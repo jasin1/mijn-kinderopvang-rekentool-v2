@@ -106,6 +106,14 @@ const chosenDays = document.getElementById("chosen-days");
 const totalHours = document.getElementById("total-hours");
 const totalCost = document.getElementById("total-cost");
 const notification = document.getElementById("notification");
+const backBtn = document.getElementById("back-btn");
+
+// ---- form hidden inputs
+const formService = document.getElementById("form-service");
+const formTariff = document.getElementById("form-tariff");
+const formDays = document.getElementById("form-days");
+const formHours = document.getElementById("form-hours");
+const formTotal = document.getElementById("form-total");
 
 //----- helper functions ------------- //
 
@@ -222,17 +230,34 @@ function updateStepDisplay() {
 }
 
 function calculation(a, b) {
-  const korting = a*230;
+  notification.textContent = "";
+  const korting = a * 230;
   if (b > 230) {
     notification.textContent = `
     * U krijgt een halve dag gratis van ons bij dit gekozen opvang pakket. Normaliter 260 uur maar u ontvangt 30 uur korting dat betekend wat u moet doorgeven aan de belastingdienst is; 230 X €${state.selectedTariff} = €${korting} per maand voor 5 hele dagen!
-    `
-    return a * 230;
+    `;
+    return `€ ${(a * 230).toFixed(2)}`;
   } else {
-    return a * b;
+    return `€ ${(a * b).toFixed(2)}`;
   }
 }
 
+function formatTariff(tariff) {
+  if (tariff % 1 !== 0) {
+    const parts = tariff.toString().split(".");
+    if (parts[1].length === 1) {
+      return `${tariff}0`;
+    }
+  }
+  return tariff.toString();
+}
+
+const isLastStep = state.currentStep === steps.length;
+function toggleContainers(showFirst) {
+  const containers = document.querySelectorAll(".container");
+  containers[0].classList.toggle("hidden", !showFirst);
+  containers[1].classList.toggle("hidden", showFirst);
+}
 
 updateProgressBar();
 
@@ -292,7 +317,6 @@ function populateServiceStep() {
       updateState("selectedTitle", data[key].title);
       updateButtonStates();
       stepText[0].innerHTML = formattedName;
-
       // console.log("selected service: ", state.selectedService);
       // console.log("Selected days:", state.selectedDays);
     });
@@ -323,7 +347,7 @@ function populateTariffStep() {
     title.textContent = option.title;
 
     const tariffValue = document.createElement("span");
-    tariffValue.textContent = `Tarief: €${option.tarief} per uur`;
+    tariffValue.textContent = `Tarief: €${formatTariff(option.tarief)} per uur`;
 
     // Append children to build the structure
     tariffDiv.appendChild(title);
@@ -354,10 +378,13 @@ function populateTariffStep() {
         updateButtonStates();
         state.selectedDays = [];
         chosenService.textContent = state.selectedTitle;
-        chosenTariff.textContent = `€ ${state.selectedTariff}`;
+        chosenTariff.textContent = `€ ${formatTariff(state.selectedTariff)}`;
       }
 
-      const formattedText = formatStep2Txt(option.title, option.tarief);
+      const formattedText = formatStep2Txt(
+        option.title,
+        formatTariff(option.tarief),
+      );
       stepText[1].innerHTML = formattedText;
     });
   });
@@ -421,6 +448,13 @@ function populateDaysStep() {
         .toFixed(2);
       totalHours.textContent = meHours;
       totalCost.textContent = calculation(state.selectedTariff, meHours);
+      //---update form hidden inputs
+      formService.value = state.selectedTitle;
+      formTariff.value = formatTariff(state.selectedTariff);
+      formDays.value = state.selectedDays.map((day) => day.name).join(", ");
+      formHours.value = meHours;
+      formTotal.value = calculation(state.selectedTariff, meHours);
+
       // totalCost.textContent = (state.selectedTariff * meHours).toFixed(2);
       updateButtonStates();
 
@@ -428,7 +462,6 @@ function populateDaysStep() {
     });
   });
 }
-
 
 // ------ Event Listeners -------- //
 
@@ -456,8 +489,15 @@ next.addEventListener("click", () => {
     state.currentStep += 1;
     updateStepDisplay();
     updateButtonStates();
+    
     populateStep(state.currentStep);
   } else if (state.currentStep === steps.length) {
     console.log("last step");
+    toggleContainers(false);
   }
+  updateProgressBar();
+});
+
+backBtn.addEventListener("click",()=>{
+  toggleContainers(true);
 });

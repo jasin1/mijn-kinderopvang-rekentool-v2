@@ -125,11 +125,6 @@ h2{
   background-color: blue;
 }
 
-/* .next:disabled{
-  opacity: 0.5;
-  cursor: not-allowed;
-} */
-
 
 .progress-bar{
   display: flex;
@@ -215,5 +210,9 @@ h2{
 
 .form{
   flex: 1;
+}
+
+.hidden{
+  display: none;
 }
 

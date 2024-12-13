@@ -85,7 +85,7 @@
             </div>
           </div>
         </section>
-        <section class="container">
+        <section class="container hidden">
           <div class="summary">
             <div class="sum-wrapper">
 
@@ -103,9 +103,39 @@
                 <div id="total-cost" class="summary-value">----</div>
               </div>
               <div id="notification"></div>
+              <div class="btn-wrapper">
+                <button id="back-btn" class="back-btn">Terug</button>
+              </div>
             </div>
           </div>
-          <div class="form">form</div>
+          <div class="form">
+            <h4>Stuur offerte naar uzelf</h4>
+            <div class="form-wrapper">
+              <form action="">
+                <div class="input-wrapper">
+                  <label for="" class="form-label"></label>
+                  <input type="text" class="form-input" placeholder="Uw naam" required/>
+                </div>
+                <div class="input-wrapper">
+                  <label for="" class="form-label"></label>
+                  <input type="text" class="form-input" placeholder="Telefoonnummer" required/>
+                </div>
+                <div class="input-wrapper">
+                  <label for="" class="form-label"></label>
+                  <input type="text" class="form-input" placeholder="Email adres" required/>
+                </div>
+                <div class="submit-btn-wrapper"><button type="submit" class="submit-btn">Verzenden</button></div>
+                <div class="hidden">
+                  <input type="text" id="form-service"/>
+                  <input type="text" id="form-tariff"/>
+                  <input type="text" id="form-days"/>
+                  <input type="text" id="form-hours"/>
+                  <input type="text" id="form-total"/>
+                </div>
+
+              </form>
+            </div>
+          </div>
         </section>
       </article>
     </main>
