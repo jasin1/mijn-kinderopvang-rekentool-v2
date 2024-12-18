@@ -93,7 +93,13 @@ const state = {
 // -- Steps and buttons
 const prev = document.querySelector(".prev");
 const next = document.querySelector(".next");
-const steps = document.querySelectorAll(".step");
+// const steps = document.querySelectorAll(".step");
+const steps = [
+  document.querySelector("#step-1"),
+  document.querySelector("#step-2"),
+  document.querySelector("#step-3"),
+  document.querySelector("#step-4"),
+];
 
 // -- Progress bar
 const progressBar = document.querySelector(".progress-bar");
@@ -122,6 +128,7 @@ function updateState(key, value) {
     state[key] = value;
   }
 }
+
 function populateStep(step) {
   switch (step) {
     case 1:
@@ -133,11 +140,15 @@ function populateStep(step) {
     case 3:
       populateDaysStep();
       break;
+    case 4: // Show summary
+      toggleContainers(false); // Switch to summary container
+      break;
     default:
       console.error("Unknown step!");
   }
   updateButtonStates();
   updateProgressBar();
+  updateStepDisplay(); // Ensure correct visibility for steps in first container
 }
 
 function validateStep(step) {
@@ -221,13 +232,23 @@ function formateServiceName(key, isLast) {
 
 function updateStepDisplay() {
   steps.forEach((step, index) => {
+    // Remove active class from all steps
     step.classList.remove("active");
 
+    // Add active class to the current step
     if (index + 1 === state.currentStep) {
       step.classList.add("active");
     }
   });
+
+  // Handle visibility of the summary container
+  if (state.currentStep === steps.length) {
+    toggleContainers(false); // Show summary
+  } else {
+    toggleContainers(true); // Show first container
+  }
 }
+
 
 function calculation(a, b) {
   notification.textContent = "";
@@ -253,10 +274,19 @@ function formatTariff(tariff) {
 }
 
 const isLastStep = state.currentStep === steps.length;
+
 function toggleContainers(showFirst) {
-  const containers = document.querySelectorAll(".container");
-  containers[0].classList.toggle("hidden", !showFirst);
-  containers[1].classList.toggle("hidden", showFirst);
+  console.log(`toggleContainers called with showFirst: ${showFirst}`);
+  const firstContainer = document.querySelector(".container:not(#step-4)");
+  const summaryContainer = document.querySelector("#step-4");
+
+  if (showFirst) {
+    firstContainer.classList.remove("hidden");
+    summaryContainer.classList.add("hidden");
+  } else {
+    firstContainer.classList.add("hidden");
+    summaryContainer.classList.remove("hidden");
+  }
 }
 
 updateProgressBar();
@@ -489,7 +519,7 @@ next.addEventListener("click", () => {
     state.currentStep += 1;
     updateStepDisplay();
     updateButtonStates();
-    
+
     populateStep(state.currentStep);
   } else if (state.currentStep === steps.length) {
     console.log("last step");
@@ -498,6 +528,9 @@ next.addEventListener("click", () => {
   updateProgressBar();
 });
 
-backBtn.addEventListener("click",()=>{
-  toggleContainers(true);
+backBtn.addEventListener("click", () => {
+  state.currentStep = 3; // Go back to step 3
+  toggleContainers(true); // Show the first container
+  updateProgressBar(); // Update progress bar
+  updateStepDisplay(); // Ensure step 3 is visible
 });

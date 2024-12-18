@@ -59,6 +59,10 @@ h2{
   font-size: 2rem;
 }
 
+h3::first-letter{
+  text-transform: uppercase;
+}
+
 .container{
   display: flex;
   gap: 2rem;
@@ -200,6 +204,7 @@ h2{
   flex: 1.2;
 }
 
+
 .summary-grid{
   width: 100%;
   display: grid;
@@ -212,7 +217,28 @@ h2{
   flex: 1;
 }
 
-.hidden{
+.container.hidden{
   display: none;
+}
+
+#step-4.hidden{
+  display: none;
+}
+
+#step-4{
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.hide{
+  display: none;
+}
+
+
+.step-show-txt::first-letter{
+  text-transform: uppercase;
+
 }
 
